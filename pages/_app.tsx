@@ -1,8 +1,22 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import '../styles/globals.css';
+import type { AppProps } from 'next/app';
+import { GlobalStyles } from 'twin.macro';
+import { SessionProvider } from 'next-auth/react';
+import { Session } from 'next-auth';
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+interface CustomProps extends AppProps {
+   pageProps: { session: Session };
 }
 
-export default MyApp
+function MyApp({ Component, pageProps: { session, ...pageProps } }: CustomProps) {
+   return (
+      <>
+         <SessionProvider session={session}>
+            <GlobalStyles />
+            <Component {...pageProps} />
+         </SessionProvider>
+      </>
+   );
+}
+
+export default MyApp;
