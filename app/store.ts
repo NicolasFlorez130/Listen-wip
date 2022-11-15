@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import songSlice from '../Features/CurrentSong/song-slice';
-import userSlice from '../Features/User/user-slice';
+import songSlice from '../features/currentSong/song-slice';
+import userSlice from '../features/user/user-slice';
 
 const store = configureStore({
    reducer: {

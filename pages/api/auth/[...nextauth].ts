@@ -1,28 +1,15 @@
-import nextAuth, { NextAuthOptions, Session } from 'next-auth';
-import { JWT } from 'next-auth/jwt';
+import nextAuth, { NextAuthOptions } from 'next-auth';
 import SpotifyProvider from 'next-auth/providers/spotify';
 import refreshAccessToken from '../../../lib/refreshAccessToken';
-import { LOGIN_URL } from '../../../lib/spotify';
-
-interface User {
-   username?: string;
-   accessToken?: string;
-   refreshToken?: string;
-}
-
-interface ExtendedJWT extends JWT {
-   username: string;
-   accessToken: string;
-   refreshToken: string;
-   tokenExpires: number;
-}
+import spotifyApi, { scopes } from '../../../lib/spotify';
+import { ExtendedJWT, User } from './types';
 
 export const authOptions: NextAuthOptions = {
    providers: [
       SpotifyProvider({
          clientId: process.env.SPOTIFY_CLIENT_ID ?? '',
          clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? '',
-         authorization: LOGIN_URL,
+         authorization: spotifyApi.createAuthorizeURL(scopes, 'random-state-owo'),
       }),
    ],
    secret: process.env.JWT_SECRET,
@@ -43,15 +30,7 @@ export const authOptions: NextAuthOptions = {
                  }
          ) as ExtendedJWT;
 
-         if (account && user) {
-            return typedToken;
-         }
-
-         if (Date.now() < typedToken.tokenExpires) {
-            return typedToken;
-         }
-
-         return await refreshAccessToken(typedToken);
+         return typedToken;
       },
       async session({ session, token, user }) {
          const typedUser = session.user as User;
